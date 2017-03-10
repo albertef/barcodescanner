@@ -46,6 +46,11 @@
                         }
                     ]
                 }
+            },
+            "res/values/strings.xml": {
+                "parents": {
+                    "/resources": []
+                }
             }
         }
     },

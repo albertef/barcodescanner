@@ -7,6 +7,14 @@
         "is_top_level": true,
         "variables": {}
     },
+    "cordova-plugin-compat": {
+        "source": {
+            "type": "registry",
+            "id": "cordova-plugin-compat"
+        },
+        "is_top_level": false,
+        "variables": {}
+    },
     "phonegap-plugin-barcodescanner": {
         "source": {
             "type": "registry",
@@ -16,13 +24,5 @@
         "variables": {
             "CAMERA_USAGE_DESCRIPTION": "To scan barcodes"
         }
-    },
-    "cordova-plugin-compat": {
-        "source": {
-            "type": "registry",
-            "id": "cordova-plugin-compat"
-        },
-        "is_top_level": false,
-        "variables": {}
     }
 }

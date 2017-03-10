@@ -1,44 +1,42 @@
 window.onload = function() {
     document.addEventListener('deviceready', onDeviceReady, false);
-	barcodescan();
 }
 
 function onDeviceReady() {
-    this.receivedEvent('deviceready');
-	this.barcodescan();
-}
-
-function receivedEvent(id) {
-    var parentElement = document.getElementById(id);
-    var listeningElement = parentElement.querySelector('.listening');
-    var receivedElement = parentElement.querySelector('.received');
-
-    listeningElement.setAttribute('style', 'display:none;');
-    receivedElement.setAttribute('style', 'display:block;');
+	//barcodescan();
 }
 	
 function barcodescan() {
-	alert(8);
 	cordova.plugins.barcodeScanner.scan(
-		alert(9);
+		
 		function (result) {
-			alert("We got a barcode\n" +
+			console.log("test");
+			var out = "We got a barcode\n" +
 			"Result: " + result.text + "\n" +
 			"Format: " + result.format + "\n" +
-			"Cancelled: " + result.cancelled);
+			"Cancelled: " + result.cancelled;
+			
+			document.getElementById("barcoderesult").innerHTML = out;
+			
+			cordova.plugins.barcodeScanner.encode(cordova.plugins.barcodeScanner.Encode.TEXT_TYPE, result.text, function(success) {
+				alert("encode success: " + success);
+			  }, function(fail) {
+				alert("encoding failed: " + fail);
+			  }
+			);
 		},
 		function (error) {
 			alert("Scanning failed: " + error);
 		},
 		{
-			preferFrontCamera : true,
+			//preferFrontCamera : true,
 			showFlipCameraButton : true,
 			showTorchButton : true,
-			torchOn: true,
-			prompt : "Place a barcode inside the scan area",
+			//torchOn: true,
+			//prompt : "Place a barcode inside the scan area",
 			resultDisplayDuration: 500,
-			formats : "QR_CODE,PDF_417",
-			orientation : "landscape"
+			//formats : "QR_CODE,PDF_417",
+			//orientation : "landscape"
 		}
 	);
 }
