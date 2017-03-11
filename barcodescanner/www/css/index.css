@@ -1,9 +1,53 @@
 body {
-    display: flex;
-	align-items: center;
-	justify-content: center;
-    height: 100vh;
-	flex-direction: column;
+	background: #009688;
+}
+a.red {
+	position: fixed;
+	bottom: 5%;
+	right: 5%;
+}
+a.red i{
+	line-height: 66px !important;
+}
+.mainhead {
+	color: #FFF;
+    text-align: center;
+    font-size: 1.5rem;
+    margin-top: 10%;
+}
+.homepageicons{
+	text-align: center;
+	margin-top: calc(50vh - 100px);
+	transition: .5s all;
+}
+.homepageicons.active{
+	margin-top: calc(50vh - 250px);
+	transition: .5s all;
+}
+.homepageicons i {
+	color: #FFF;
+	font-size: 10rem;
+}
+.outputcard {
+	margin-top: 50px;
+	opacity: 0;
+	visibility: hidden;
+	transition: .5s all;
+}
+.outputcard.show {
+	opacity: 1;
+	visibility: visible;
+	transition: .5s all;
+}
+#encoderesult {
+	opacity: 0;
+	margin-top: 15px;
+	display: inline-block;
+    width: 100%;
+}
+#encoderesult img.loadingimage {
+	width: 5%;
+	margin: 0 auto;
 }
 
 
