@@ -27,4 +27,7 @@
     <plugin name="phonegap-plugin-barcodescanner" spec="~6.0.5">
         <variable name="CAMERA_USAGE_DESCRIPTION" value="To scan barcodes" />
     </plugin>
+    <plugin name="cordova-plugin-inappbrowser" spec="https://git-wip-us.apache.org/repos/asf/cordova-plugin-inappbrowser.git" />
+    <plugin name="cordova-sqlite-storage" spec="~2.0.2" />
+    <plugin name="cordova-plugin-x-toast" spec="~2.6.0" />
 </widget>

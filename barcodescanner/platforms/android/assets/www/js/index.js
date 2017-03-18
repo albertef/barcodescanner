@@ -1,13 +1,27 @@
+var db = null;
+
 window.onload = function() {
     document.addEventListener('deviceready', onDeviceReady, false);
-	document.getElementById('encoderesult').innerHTML="<img src='img/squares.gif' class='loadingimage'></p>"
+	document.getElementById('encoderesult').innerHTML="<img src='img/squares.gif' class='loadingimage'></p>";
 }
 
 function onDeviceReady() {
 	//barcodescan();
+	db = window.sqlitePlugin.openDatabase({name: 'barcode.db', location: 'default'});
 }
-	
+function formatDate(date) {
+	var hours = date.getHours();
+	var minutes = date.getMinutes();
+	var ampm = hours >= 12 ? 'pm' : 'am';
+	hours = hours % 12;
+	hours = hours ? hours : 12; // the hour '0' should be '12'
+	minutes = minutes < 10 ? '0'+minutes : minutes;
+	var strTime = hours + ':' + minutes + ' ' + ampm;
+	return date.getMonth()+1 + "/" + date.getDate() + "/" + date.getFullYear() + " " + strTime;
+}
+
 function barcodescan() {
+	document.getElementById('encoderesult').innerHTML="";
 	cordova.plugins.barcodeScanner.scan(
 		
 		function (result) {
@@ -15,26 +29,46 @@ function barcodescan() {
 			document.getElementById("homepageicons").className += " active";
 			document.getElementById("barcodevalue").innerHTML = result.text;
 			document.getElementById("barcodeformat").innerHTML = result.format;
+			if(result.format == "QR_CODE"){
+				document.getElementById('qrlink').style.display = "inline";
+				document.getElementById('barcodedecode').style.display = "none";
+			}
+			else {
+				document.getElementById('qrlink').style.display = "none";
+				document.getElementById('barcodedecode').style.display = "inline";
+			}
+			var curdate = new Date();
+			var formatdate = formatDate(curdate);
 			
-			/*cordova.plugins.barcodeScanner.encode(cordova.plugins.barcodeScanner.Encode.TEXT_TYPE, result.text, function(success) {
-				alert("encode success: " + success);
-			  }, function(fail) {
-				alert("encoding failed: " + fail);
-			  }
-			);*/
+			db.transaction(function(tx) {
+				//tx.executeSql("DROP TABLE IF EXISTS BarCodeTable");
+				tx.executeSql('CREATE TABLE IF NOT EXISTS BarCodeTable (code, format)');
+				tx.executeSql('INSERT INTO BarCodeTable VALUES (?,?)', [result.text, result.format]);
+			}, function(error) {
+				window.plugins.toast.showWithOptions(
+				{
+					message: 'Transaction ERROR: ' + error.message,
+					duration: "short",
+					position: "bottom",
+					addPixelsY: -150
+				});
+			}, function() {
+				window.plugins.toast.showWithOptions(
+				{
+					message: 'Search history saved successfully',
+					duration: "short",
+					position: "bottom",
+					addPixelsY: -150
+				});
+			});
 		},
 		function (error) {
 			alert("Scanning failed: " + error);
 		},
 		{
-			//preferFrontCamera : true,
 			showFlipCameraButton : true,
 			showTorchButton : true,
-			//torchOn: true,
-			//prompt : "Place a barcode inside the scan area",
-			resultDisplayDuration: 500,
-			//formats : "QR_CODE,PDF_417",
-			//orientation : "landscape"
+			resultDisplayDuration: 500
 		}
 	);
 }
@@ -56,7 +90,10 @@ function encodebarcode() {
         if (xmlhttp.readyState == XMLHttpRequest.DONE ) {
             if (xmlhttp.status == 200) {
 			    var jsonout = JSON.parse(xmlhttp.responseText);
-				if(jsonout.status.message != "Product not found") {
+				if(jsonout.status.message == "Product not found" || !jsonout.product.attributes || jsonout.status.code == "404") {
+					document.getElementById('encoderesult').innerHTML = '<p><h5>Product not found!</h5></p>';
+				}
+				else {
 					jsonoutput = '<p><h5>' + jsonout.product.attributes.product + '</h5></p>' +
 							  '<p>' + jsonout.product.attributes.category_text + '</p>' +
 							  '<p>' + jsonout.product.attributes.long_desc + '</p>' +
@@ -65,9 +102,6 @@ function encodebarcode() {
 							  
 					document.getElementById('encoderesult').innerHTML = "<p><img src=" + jsonout.product.image +"></p>";
 					document.getElementById('encoderesult').innerHTML += jsonoutput;
-				}
-				else {
-					document.getElementById('encoderesult').innerHTML = '<p><h5>' + jsonout.status.message + '!</h5></p>';
 				}
            }
            else if (xmlhttp.status == 400) {
@@ -83,6 +117,28 @@ function encodebarcode() {
     xmlhttp.send();
 }
 
-//7F35D39458C459F1
-//
-	
+function encodeqrcode() {
+	var result = document.getElementById("barcodevalue").innerHTML;
+	var urlRegex =/(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+	var match = result.match(urlRegex);
+	var ref = window.open(match, '_blank', 'location=yes');
+	ref.addEventListener('loadstart', function(event) { });
+	ref.addEventListener('exit', cardclose);
+}
+
+function populatedb() {
+	var tableout = "";
+	$('#modal1').modal();
+	db.transaction(function(tx) {
+		// ORDER BY date DESC LIMIT 10
+		tx.executeSql('SELECT * FROM BarCodeTable', [], function(tx, rs) {
+			for (var i=0; i < rs.rows.length; i++){
+				row = rs.rows.item(i);
+				tableout += "<tr><td>" + row.code + "</td><td>" + row.format + "</td></tr>";
+			}
+			document.getElementById('historytable').innerHTML = tableout;
+		}, function(tx, error) {
+			alert('SELECT error: ' + error.message);
+		});
+	});
+}

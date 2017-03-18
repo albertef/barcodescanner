@@ -6,8 +6,13 @@ a.red {
 	bottom: 5%;
 	right: 5%;
 }
-a.red i{
+a.red i, a.yellow i {
 	line-height: 66px !important;
+}
+a.yellow {
+	position: fixed;
+	bottom: 5%;
+	left: 5%;
 }
 .mainhead {
 	color: #FFF;
@@ -30,9 +35,12 @@ a.red i{
 }
 .outputcard {
 	margin-top: 50px;
+	margin-bottom: 100px;
 	opacity: 0;
 	visibility: hidden;
 	transition: .5s all;
+	word-wrap: break-word;
+	
 }
 .outputcard.show {
 	opacity: 1;
@@ -49,5 +57,17 @@ a.red i{
 	width: 5%;
 	margin: 0 auto;
 }
-
-
+a.right-align{
+	float: right;
+	margin-right:0 !important;
+	font-weight: 500;
+}
+.card-title {
+	font-size: 1.64rem;
+}
+#qrlink {
+	display: none;
+}
+.modal-action.modal-close  {
+	float: none !important;
+}

@@ -22,6 +22,9 @@
 		<a class="btn-floating btn-large waves-effect waves-light red" onclick="barcodescan()">
 			<i class="fa fa-camera" aria-hidden="true"></i>
 		</a>
+		<a class="btn-floating btn-large waves-effect waves-light yellow darken-3" href="#modal1" onclick="populatedb()">
+			<i class="fa fa-database" aria-hidden="true"></i>
+		</a>
 		
 		<div class="row outputcard" id="outputcard">
 			<div class="col s12">
@@ -33,10 +36,23 @@
 						<span id="encoderesult"><img src="img/squares.gif" class="loadingimage"><span>
 					</div>
 					<div class="card-action">
-						<a href="#" onclick="cardclose()">close</a>
-						<a href="#" onclick="encodebarcode()">Encode</a>
+						<a href="#" onclick="cardclose()" class="right-align red-text text-darken-4">close</a>
+						<a href="#" onclick="encodebarcode()" id="barcodedecode">Decode</a>
+						<a href="#" onclick="encodeqrcode()" id="qrlink">Go to link</a>
 					</div>
 				</div>
+			</div>
+		</div>
+		
+		<!-- Modal Structure -->
+		<div id="modal1" class="modal bottom-sheet">
+			<div class="modal-content">
+				<h5><strong>Search History</strong></h5>
+				<p>View your previous searched items</p>
+				<table class="bordered" id="historytable"></table>
+			</div>
+			<div class="modal-footer center-align">
+				<a href="#!" class="modal-action modal-close waves-effect waves-green btn">Close</a>
 			</div>
 		</div>
         
