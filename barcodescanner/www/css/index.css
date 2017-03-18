@@ -71,3 +71,7 @@ a.right-align{
 .modal-action.modal-close  {
 	float: none !important;
 }
+.modal-action.btn.red {
+	float: none !important;
+	position: static;
+}

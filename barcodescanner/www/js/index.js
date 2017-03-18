@@ -12,12 +12,12 @@ function onDeviceReady() {
 function formatDate(date) {
 	var hours = date.getHours();
 	var minutes = date.getMinutes();
-	var ampm = hours >= 12 ? 'pm' : 'am';
+	var ampm = hours >= 12 ? 'PM' : 'AM';
 	hours = hours % 12;
 	hours = hours ? hours : 12; // the hour '0' should be '12'
 	minutes = minutes < 10 ? '0'+minutes : minutes;
 	var strTime = hours + ':' + minutes + ' ' + ampm;
-	return date.getMonth()+1 + "/" + date.getDate() + "/" + date.getFullYear() + " " + strTime;
+	return date.getMonth()+1 + "/" + date.getDate() + "/" + parseInt(date.getFullYear().toString().substr(2)) + " " + strTime;
 }
 
 function barcodescan() {
@@ -41,9 +41,8 @@ function barcodescan() {
 			var formatdate = formatDate(curdate);
 			
 			db.transaction(function(tx) {
-				//tx.executeSql("DROP TABLE IF EXISTS BarCodeTable");
-				tx.executeSql('CREATE TABLE IF NOT EXISTS BarCodeTable (code, format)');
-				tx.executeSql('INSERT INTO BarCodeTable VALUES (?,?)', [result.text, result.format]);
+				tx.executeSql('CREATE TABLE IF NOT EXISTS BarCodeTable (scandate, code, format)');
+				tx.executeSql('INSERT INTO BarCodeTable VALUES (?,?,?)', [formatdate, result.text, result.format]);
 			}, function(error) {
 				window.plugins.toast.showWithOptions(
 				{
@@ -71,6 +70,29 @@ function barcodescan() {
 			resultDisplayDuration: 500
 		}
 	);
+}
+
+function cleardb(){
+	db.transaction(function(tx) {
+		tx.executeSql("DELETE FROM BarCodeTable");
+	}, function(error) {
+		window.plugins.toast.showWithOptions(
+		{
+			message: 'Transaction ERROR: ' + error.message,
+			duration: "short",
+			position: "bottom",
+			addPixelsY: -150
+		});
+	}, function() {
+		window.plugins.toast.showWithOptions(
+		{
+			message: 'History cleared successfully',
+			duration: "short",
+			position: "bottom",
+			addPixelsY: -150
+		});
+	});
+	populatedb();
 }
 
 function cardclose() {
@@ -130,11 +152,15 @@ function populatedb() {
 	var tableout = "";
 	$('#modal1').modal();
 	db.transaction(function(tx) {
-		// ORDER BY date DESC LIMIT 10
-		tx.executeSql('SELECT * FROM BarCodeTable', [], function(tx, rs) {
-			for (var i=0; i < rs.rows.length; i++){
-				row = rs.rows.item(i);
-				tableout += "<tr><td>" + row.code + "</td><td>" + row.format + "</td></tr>";
+		tx.executeSql('SELECT * FROM BarCodeTable ORDER BY scandate DESC LIMIT 10', [], function(tx, rs) {
+			if(rs.rows.length == 0){
+				tableout += "<tr><td><h5 class='red-text'>No records found!</h5></td></tr>";
+			}
+			else {
+				for (var i=0; i < rs.rows.length; i++){
+					row = rs.rows.item(i);
+					tableout += "<tr class='teal-text'><td>" + row.scandate + "</td><td>" + row.code + "</td><td>" + row.format + "</td></tr>";
+				}
 			}
 			document.getElementById('historytable').innerHTML = tableout;
 		}, function(tx, error) {
